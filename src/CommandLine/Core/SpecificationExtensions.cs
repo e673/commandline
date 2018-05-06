@@ -37,6 +37,42 @@ namespace CommandLine.Core
                 specification.Hidden);
         }
 
+        public static OptionSpecification WithHelpText(this OptionSpecification specification, string newHelpText)
+        {
+            return new OptionSpecification(
+                specification.ShortName,
+                specification.LongName,
+                specification.Required,
+                specification.SetName,
+                specification.Min,
+                specification.Max,
+                specification.Separator,
+                specification.DefaultValue,
+                newHelpText,
+                specification.MetaValue,
+                specification.EnumValues,
+                specification.ConversionType,
+                specification.TargetType,
+                specification.Hidden);
+        }
+
+        public static ValueSpecification WithHelpText(this ValueSpecification specification, string newHelpText)
+        {
+            return new ValueSpecification(
+                specification.Index,
+                specification.MetaName,
+                specification.Required,
+                specification.Min,
+                specification.Max,
+                specification.DefaultValue,
+                newHelpText,
+                specification.MetaValue,
+                specification.EnumValues,
+                specification.ConversionType,
+                specification.TargetType,
+                specification.Hidden);
+        }
+
         public static string UniqueName(this OptionSpecification specification)
         {
             return specification.ShortName.Length > 0 ? specification.ShortName : specification.LongName;
