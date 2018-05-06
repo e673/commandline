@@ -40,7 +40,7 @@ namespace CommandLine.Core
             get { return hidden; }
         }
 
-        public static Verb FromAttribute(VerbAttribute attribute)
+        private static Verb FromAttribute(VerbAttribute attribute)
         {
             return new Verb(
                 attribute.Name,
@@ -49,14 +49,36 @@ namespace CommandLine.Core
                 );
         }
 
+        public Verb WithHelpText(string newHelpText)
+        {
+            return new Verb(
+                Name,
+                newHelpText,
+                Hidden
+                );
+        }
+
         public static IEnumerable<Tuple<Verb, Type>> SelectFromTypes(IEnumerable<Type> types)
         {
-            return from type in types
-                   let attrs = type.GetTypeInfo().GetCustomAttributes(typeof(VerbAttribute), true).ToArray()
-                   where attrs.Length == 1
-                   select Tuple.Create(
-                       FromAttribute((VerbAttribute)attrs.Single()),
-                       type);
+            foreach (var type in types.Select(x => x.GetTypeInfo()))
+            {
+                var typeInfo = type.GetTypeInfo();
+
+                var attrs = typeInfo.GetCustomAttributes(typeof(VerbAttribute), true).ToArray();
+                var helpAttr = typeInfo.GetCustomAttributes(typeof(ResourceHelpTextAttribute), true).Cast<ResourceHelpTextAttribute>().FirstOrDefault();
+
+                if (attrs.Length != 1)
+                    continue;
+
+                var verb = FromAttribute((VerbAttribute)attrs.Single());
+
+                if (helpAttr != null)
+                {
+                    verb = verb.WithHelpText(helpAttr.Text);
+                }
+
+                yield return Tuple.Create(verb, type);
+            }
         }
     }
 }

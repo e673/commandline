@@ -9,7 +9,7 @@ namespace CommandLine
     /// <summary>
     /// Configure HelpText to be taken from resource
     /// </summary>
-    [AttributeUsage(AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class)]
     public sealed class ResourceHelpTextAttribute
         : Attribute
     {
