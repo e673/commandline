@@ -111,6 +111,10 @@ namespace CommandLine.Core
         public static Specification FromProperty(PropertyInfo property)
         {       
             var attrs = property.GetCustomAttributes(true);
+
+            var ha = attrs.OfType<ResourceHelpTextAttribute>();
+            var localizedHelpText = ha.Count() == 1 ? ha.First().Text : null;
+
             var oa = attrs.OfType<OptionAttribute>();
             if (oa.Count() == 1)
             {
@@ -118,20 +122,34 @@ namespace CommandLine.Core
                     property.PropertyType.GetTypeInfo().IsEnum
                         ? Enum.GetNames(property.PropertyType)
                         : Enumerable.Empty<string>());
+
+                if (localizedHelpText != null)
+                {
+                    spec = spec.WithHelpText(localizedHelpText);
+                }
+
                 if (spec.ShortName.Length == 0 && spec.LongName.Length == 0)
                 {
                     return spec.WithLongName(property.Name.ToLowerInvariant());
                 }
+
                 return spec;
             }
 
             var va = attrs.OfType<ValueAttribute>();
             if (va.Count() == 1)
             {
-                return ValueSpecification.FromAttribute(va.Single(), property.PropertyType,
+                var spec = ValueSpecification.FromAttribute(va.Single(), property.PropertyType,
                     property.PropertyType.GetTypeInfo().IsEnum
                         ? Enum.GetNames(property.PropertyType)
                         : Enumerable.Empty<string>());
+
+                if (localizedHelpText != null)
+                {
+                    spec = spec.WithHelpText(localizedHelpText);
+                }
+
+                return spec;
             }
 
             throw new InvalidOperationException();
